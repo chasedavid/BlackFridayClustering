@@ -13,36 +13,45 @@ library(plotly)
 library(dplyr)
 ```
 
-```{r cars}
+```{r}
 data.tb <- read_csv("./data/BlackFriday.csv")
 data.tb %>% head(25)
 
+test.tb <- data.tb %>% head(2000)
 ```
 #find unique values for Age
 ```{r}
-unique(data.tb$Age)  
+unique(test.tb$Age)  
 ```
 
 #functions to filter Ages into return values (numeric representations of the group)
 ```{r}
 ageFilter <- function(age) {
-  switch(age, "0-17"=0, "18-25"=1, "26-35"=3, "36-45"=4, "46-50"=5, "51-55"=6, "55+"=7)
+  switch(age, "0-17"=1, "18-25"=2, "26-35"=3, "36-45"=4, "46-50"=5, "51-55"=6, "55+"=7)
 }
-ageFilter("0-17")
+ageFilter("51-55")
 ```
 #pip Age vector into ageFilter(), append to tibble
 ```{r}
-data.tb$Age %>% (ageFilter())
+##data.tb$age <- ageFilter(data.tb$Age)
+test.tb$age <- test.tb$Age
+
+#data.tb %>% head()
+for (i in 1:length(test.tb$age)) {
+  test.tb$age[i] <- ageFilter(test.tb$age[i])
+  ##print(test.tb$Age + " " + test.tb$age)
+}
+
 ```
 
 #Regression: Age vs Purchase Value
 ```{r}
-fit <- lm(formula= data.tb$Purchase ~ data.tb$Age + 0, data=data.tb)
+fit <- lm(formula= test.tb$Purchase ~ test.tb$age + 0, data=test.tb)
 fit
 ```
 #Correlation: Age vs Purchase Value
 ```{r}
-cor(data.tb$Age %>% as.numeric(), data.tb$Purchase %>% as.numeric())
+cor(test.tb$age, test.tb$Purchase %>% as.numeric())
 ```
 
 #find the kmeans
