@@ -1,6 +1,8 @@
 ---
 title: "Main"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -11,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(plotly)
 library(dplyr)
+library(klaR)
+
 ```
 
 ```{r}
@@ -18,6 +22,7 @@ data.tb <- read_csv("./data/BlackFriday.csv")
 data.tb %>% head(25)
 
 test.tb <- data.tb %>% head(2000)
+
 ```
 #find unique values for Age
 ```{r}
@@ -47,16 +52,24 @@ for (i in 1:length(test.tb$age)) {
 #Regression: Age vs Purchase Value
 ```{r}
 fit <- lm(formula= test.tb$Purchase ~ test.tb$age + 0, data=test.tb)
-fit
+fit[1]
 ```
 #Correlation: Age vs Purchase Value
 ```{r}
-cor(test.tb$age, test.tb$Purchase %>% as.numeric())
+cor(test.tb$age %>% as.numeric(), test.tb$Purchase %>% as.numeric())
 ```
 
-#find the kmeans
 ```{r}
-km <- kmeans(data.tb, 10)
-km 
+test_na.tb <- na.omit(test.tb)
+
+plot <- plot_ly(
+  x = c(test_na.tb$Age),
+  y = c(test_na.tb$Purchase),
+  name = "Age vs. Purchase Amount",
+  type = "bar"
+)
+
+plot
 ```
+
 
