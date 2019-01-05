@@ -14,19 +14,23 @@ library(tidyverse)
 library(plotly)
 library(dplyr)
 library(klaR)
-
+library(ggpubr)
 ```
 
 ```{r}
 data.tb <- read_csv("./data/BlackFriday.csv")
-data.tb %>% head(25)
+#data.tb %>% head(25)
 
-test.tb <- data.tb %>% head(2000)
+data_random.tb <- sample_n(data.tb, 2000, replace=TRUE)
+
+#data_random_unique.tb <- unique(data_random.tb)
+
+#test.tb <- data.tb %>% head(2000)
 
 ```
 #find unique values for Age
 ```{r}
-unique(test.tb$Age)  
+unique(data_random.tb$Age)  
 ```
 
 #functions to filter Ages into return values (numeric representations of the group)
@@ -36,40 +40,54 @@ ageFilter <- function(age) {
 }
 ageFilter("51-55")
 ```
-#pip Age vector into ageFilter(), append to tibble
+#pipe Age vector into ageFilter(), append to tibble
 ```{r}
 ##data.tb$age <- ageFilter(data.tb$Age)
-test.tb$age <- test.tb$Age
+data_random.tb$age <- data_random.tb$Age
 
 #data.tb %>% head()
-for (i in 1:length(test.tb$age)) {
-  test.tb$age[i] <- ageFilter(test.tb$age[i])
+for (i in 1:length(data_random.tb$age)) {
+  data_random.tb$age[i] <- ageFilter(data_random.tb$age[i])
   ##print(test.tb$Age + " " + test.tb$age)
 }
 
+#make numeric
+data_random.tb$age <- data_random.tb$age %>% as.numeric()
 ```
 
 #Regression: Age vs Purchase Value
 ```{r}
-fit <- lm(formula= test.tb$Purchase ~ test.tb$age + 0, data=test.tb)
+fit <- lm(formula= data_random.tb$Purchase ~ data_random.tb$age + 0, data=data_random.tb)
 fit[1]
 ```
 #Correlation: Age vs Purchase Value
 ```{r}
-cor(test.tb$age %>% as.numeric(), test.tb$Purchase %>% as.numeric())
+cor(data_random.tb$age %>% as.numeric(), data_random.tb$Purchase %>% as.numeric())
 ```
 
 ```{r}
-test_na.tb <- na.omit(test.tb)
+anova <- aov(data_random.tb$Purchase ~ data_random.tb$Age, data = data_random.tb)
+summary(anova)
+```
+
+```{r}
+data_random_na.tb <- na.omit(data_random.tb)
 
 plot <- plot_ly(
-  x = c(test_na.tb$Age),
-  y = c(test_na.tb$Purchase),
+  x = c(data_random_na.tb$Age),
+  y = c(data_random_na.tb$Purchase),
   name = "Age vs. Purchase Amount",
   type = "bar"
 )
 
 plot
 ```
+
+```{r}
+ggboxplot(data_random_na.tb, x = "Age", y = "Purchase", 
+          order = c("0-17", "18-25", "26-35", "36-45", "46-50", "51-55", "55+" ),
+          ylab = "Money Spent", xlab = "Age")
+```
+
 
 
